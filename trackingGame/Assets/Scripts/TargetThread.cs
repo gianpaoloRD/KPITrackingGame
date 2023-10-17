@@ -11,14 +11,16 @@ public class TargetThread : BaseThread
 {
     ArrayList target = new ArrayList();
     ArrayList cam = new ArrayList();
+    ArrayList degreeError = new ArrayList();
     string saveFilePath = null;
 
 
-    public TargetThread(ArrayList target, ArrayList cam, string saveFilePath) : base()
+    public TargetThread(ArrayList target, ArrayList cam, string saveFilePath, ArrayList degreeError) : base()
     {
         
         this.target = target;
         this.cam = cam;
+        this.degreeError = degreeError;
         this.saveFilePath = saveFilePath;
     }
     public override void RunThread()
@@ -50,7 +52,7 @@ public class TargetThread : BaseThread
 
 
         TextWriter tw = new StreamWriter(saveHere, false);
-        tw.WriteLine("Date,Target_x,TArget_y,Target_z,camRotation_x,camRotation_y,camRotation_z");
+        tw.WriteLine("Date,Target_x,TArget_y,Target_z,camRotation_x,camRotation_y,camRotation_z,DegreeError");
 
         for (int i = 0; i < target.Count; ++i)
         {
@@ -59,6 +61,8 @@ public class TargetThread : BaseThread
             if (i < target.Count) tw.Write(target[i].ToString().Replace(")", "").Replace("(", ""));
             tw.Write(",");
             if (i < cam.Count) tw.Write(cam[i].ToString().Replace(")", "").Replace("(", ""));
+            tw.Write(",");
+            if (i < degreeError.Count) tw.Write(degreeError[i]);
             tw.Write(",");
             tw.Write(System.Environment.NewLine);
         }
