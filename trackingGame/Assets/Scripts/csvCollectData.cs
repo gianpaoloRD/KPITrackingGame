@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Numerics;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -20,14 +21,18 @@ public class csvCollectData : MonoBehaviour
     int score= 0;
     float timer;
     private float _delay;
+    double pira = 0;
     string saveFilePath ="";
+    private float previousAngle = 0.0f;
+    private float previousAngle2 = 0.0f;
+    bool sing = false;
     void Start()
     {
         saveFilePath = Application.dataPath + "/../ParticipantData/";
         button.gameObject.SetActive(false);
         turn.x = target.transform.position.x;
         turn.y = target.transform.position.y;
-
+        
 
     }
 
@@ -46,14 +51,79 @@ public class csvCollectData : MonoBehaviour
         double angleDegrees = v2.AngleBetween(v1);
         double angleDegreesd = vd2.AngleBetween(vd1);
 
-        rayCast(); 
-        Vector3 cameraAngle = new Vector3(cam.transform.localEulerAngles.x, target.transform.position.y, target.transform.position.z);
-        float DegreeE=  Mathf.Acos(dotProduct(Normalize(target.transform.position),Normalize(cameraAngle)));
-        Debug.Log("target: " +target.transform.localPosition.x +" cursor :" + cam.transform.localEulerAngles.x);
-        degreeError.Add(angleDegreesd);
+        double radians = target.angle; // Replace this with the radians value you want to convert
+        double degrees = radians * (180 / Math.PI);
+        
+        if (degrees > 0) { degrees = -degrees+360; }
+        if (degrees < 0) { degrees = degrees*-1 ; }
+
+       // print(degrees);
+        // Calculate degree error with a 90-degree offset
+        double degreeErrors = Math.Abs((cam.transform.eulerAngles.y - degrees - 90) % 360);
+        double degreeErrors2 = Math.Abs((90+degrees)-cam.transform.eulerAngles.y);
+
+        if (degreeErrors2 > 180 && degrees >0) { Math.Abs(degreeErrors2 -= 360); }
+        //if (degreeErrors <= 90 ) degreeError.Add(degreeErrors);print("result:" + degreeErrors); 
+        //if (degreeErrors2 >= -90 && degreeErrors2 <= 90) {degreeError.Add(degreeErrors2);  }
+        //print(degreeErrors2);
+        double direc = DetermineDirectionAndPrintAngles((float)degrees);
+        double cursor = DetermineDirectionAndPrintAngles2(cam.transform.eulerAngles.y) ;
+        //print(Math.Abs((float)degreeErrors2));
+
+        /* 
+         * 
+         
+                if (direc > 0 && cursor > 0 && Math.Abs((float)degreeErrors2) < 1 ||
+            direc < 0 && cursor > 0 && Math.Abs((float)degreeErrors2) < 1) { //derecha
+            
+            sing = true;
+        }
+        else if ((direc < 0  && cursor < 0 && Math.Abs((float)degreeErrors2) < 1) ||
+             direc > 0   && cursor < 0 && Math.Abs((float)degreeErrors2) < 1) {//izquierda
+
+            sing = false;
+        }
+
+
+        if(sing)
+        {
+           print("derecha: " + -Math.Abs(degreeErrors2));
+        }
+        else
+        {
+            print("izquierda: " + Math.Abs(degreeErrors2));
+        } 
+         
+         
+         */
+        //print("DegreeError: " +Math.Abs((float)degreeErrors2));
+
+
+
+        //print(degreeErrors2);
+        rayCast(); //print("result:" + degreeErrors);print("result2:" + degreeErrors2);
+        //Vector3 cameraAngle = new Vector3(cam.transform.localEulerAngles.x, target.transform.position.y, target.transform.position.z);
+        //float DegreeE=  Mathf.Acos(dotProduct(Normalize(target.transform.position),Normalize(cameraAngle)));
+        //Debug.Log("target: " +target.transform.localPosition.x +" cursor :" + cam.transform.localEulerAngles.x);
         arrTarget.Add(target.transform.position);
         arrCam.Add(cam.transform.localEulerAngles);
+        degreeError.Add(degreeErrors2);
 
+
+
+
+
+
+
+
+        Vector3 directionToTarget = target.transform.position- cam.transform.position;
+        // Dirección actual de la cámara (supongamos que mira en la dirección positiva del eje X en el plano XY).
+        Vector3 cameraDirection = Vector3.right;
+
+        // Calcula el ángulo en grados entre la dirección de la cámara y la dirección al target.
+        float angleError = Vector3.SignedAngle(cameraDirection, directionToTarget, Vector3.up);
+
+        //print(angleError +"targettt");
 
         timer += Time.deltaTime;
         if (timer > _delay)
@@ -83,7 +153,60 @@ public class csvCollectData : MonoBehaviour
 
         }
     }
+    public double DetermineDirectionAndPrintAngles(float degre)
+    {
+            double direction = 0;
 
+            float referenceAngle = 0.0f; // Choose your reference angle (in degrees)
+            float currentAngle = degre; // Get the current y-rotation angle of the camera
+
+            // Calculate the change in angle
+            double angleChange = currentAngle - previousAngle;
+            //print(angleChange);
+            // Determine the direction of movement
+            //print(angleChange);
+            if (angleChange < 0.0f)
+                direction = angleChange;
+            else if (angleChange > 0.0f)
+                direction = angleChange;
+            else direction = 0;
+
+            //Debug.Log("Reference Angle: " + referenceAngle + " degrees");
+            //Debug.Log("Current Angle: " + currentAngle + " degrees");
+            //print("Direction of Movement: " + direction.ToString());
+
+            previousAngle = currentAngle; // Update the previous angle for the next frame
+            //print(direction);
+            return direction;
+        
+    }
+    public double DetermineDirectionAndPrintAngles2(float degre)
+    {
+        double direction = 0;
+
+        float referenceAngle = 0.0f; // Choose your reference angle (in degrees)
+        float currentAngle = degre; // Get the current y-rotation angle of the camera
+
+        // Calculate the change in angle
+        double angleChange = currentAngle - previousAngle2;
+        //print(angleChange);
+        // Determine the direction of movement
+
+        if (angleChange < 0.0f)
+            direction = angleChange;
+        else if (angleChange > 0.0f)
+            direction = angleChange;
+        else direction = 0;
+
+        //Debug.Log("Reference Angle: " + referenceAngle + " degrees");
+        //Debug.Log("Current Angle: " + currentAngle + " degrees");
+        //print("Direction of Movement: " + direction.ToString());
+
+        previousAngle2 = currentAngle; // Update the previous angle for the next frame
+        //print(direction);
+        return direction;
+
+    }
     public void savecsv()
     {
 
@@ -123,13 +246,31 @@ public class csvCollectData : MonoBehaviour
         
         return vector3;
     }
+    public Vector3 raydirection()
+    {
+        float azimuth = cam.transform.eulerAngles.y;
+        float elevation = cam.transform.eulerAngles.x;
 
+        // Convertir los ángulos de grados a radianes
+        float azimuthRad = azimuth * Mathf.Deg2Rad;
+        float elevationRad = elevation * Mathf.Deg2Rad;
+
+        // Calcular el vector dirección del rayo en 3D
+        Vector3 rayDirection = new Vector3(
+            Mathf.Cos(elevationRad) * Mathf.Cos(azimuthRad),
+            Mathf.Sin(elevationRad),
+            Mathf.Cos(elevationRad) * Mathf.Sin(azimuthRad)
+        );
+        return rayDirection;
+    }
     public float dotProduct(Vector3 v1, Vector3 v2)
     {
 
         float result = Vector3.Dot(v1,v2);
         return result;
     }
+
+
 
 }
 

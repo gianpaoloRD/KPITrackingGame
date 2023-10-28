@@ -5,7 +5,7 @@ using static UnityEngine.GraphicsBuffer;
 
 public class MouseMovement : MonoBehaviour
 {
-    public Vector2 turn;
+    public Vector2 turn = new Vector2(90,-0.2f);
     Camera cam;
     // Start is called before the first frame update
     void Start()

@@ -359,6 +359,7 @@
 "Assets/GabrielBissonnette/Sad - Main Menu Pack/Scripts/MainMenuManager.cs"
 "Assets/GabrielBissonnette/Sad - Main Menu Pack/Scripts/_menuAnimations.cs"
 "Assets/GabrielBissonnette/Sad - Main Menu Pack/_essentials/Demo Resources/_returnToMainMenu.cs"
+"Assets/Logic_controller.cs"
 "Assets/Low Poly Rocks Pack/Bonus Assets/Scripts/LowPolyRocks_CameraControl.cs"
 "Assets/Low Poly Rocks Pack/Bonus Assets/Scripts/LowPolyRocks_CloudsControl.cs"
 "Assets/Low Poly Rocks Pack/Bonus Assets/Scripts/LowPolyRocks_FireLightControl.cs"
